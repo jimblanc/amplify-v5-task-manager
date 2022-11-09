@@ -1,25 +1,28 @@
-import logo from './logo.svg';
+import { Amplify } from 'aws-amplify';
+import { withAuthenticator, Text, Heading, View, Tabs, TabItem } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
 import './App.css';
+import awsExports from './aws-exports';
+
+Amplify.configure(awsExports);
 
 function App() {
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <View className="App">
+      <Heading level={3}>Amplified Task Planner</Heading>
+      <Text marginBottom={"large"} marginTop={"large"}>Your tasks are displayed below.</Text>
+      <Tabs>
+        <TabItem title="Pending">
+
+        </TabItem>
+        <TabItem title="Completed">
+
+        </TabItem>
+      </Tabs>
+    </View>
   );
 }
 
-export default App;
+export default withAuthenticator(App);

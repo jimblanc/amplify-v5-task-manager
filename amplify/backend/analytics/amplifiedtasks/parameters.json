@@ -1,0 +1,22 @@
+{
+  "appName": "amplifiedtasks",
+  "roleName": "pinpointLambdaRole3630b6f0",
+  "cloudformationPolicyName": "cloudformationPolicy3630b6f0",
+  "cloudWatchPolicyName": "cloudWatchPolicy3630b6f0",
+  "pinpointPolicyName": "pinpointPolicy3630b6f0",
+  "authPolicyName": "pinpoint_amplify_3630b6f0",
+  "unauthPolicyName": "pinpoint_amplify_3630b6f0",
+  "authRoleName": {
+    "Ref": "AuthRoleName"
+  },
+  "unauthRoleName": {
+    "Ref": "UnauthRoleName"
+  },
+  "authRoleArn": {
+    "Fn::GetAtt": [
+      "AuthRole",
+      "Arn"
+    ]
+  },
+  "pinpointInAppMessagingPolicyName": "pinpointInAppMessagingPolicyName3630b6f0"
+}

@@ -1,0 +1,37 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-amplifiedtasks-staging-155444-authRole",
+      "UnauthRoleArn": "arn:aws:iam::865230342931:role/amplify-amplifiedtasks-staging-155444-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::865230342931:role/amplify-amplifiedtasks-staging-155444-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-amplifiedtasks-staging-155444-deployment",
+      "UnauthRoleName": "amplify-amplifiedtasks-staging-155444-unauthRole",
+      "StackName": "amplify-amplifiedtasks-staging-155444",
+      "StackId": "arn:aws:cloudformation:us-east-1:865230342931:stack/amplify-amplifiedtasks-staging-155444/d4c30040-6046-11ed-8eee-120dd1a5610b",
+      "AmplifyAppId": "d6qs5u6phbgzz"
+    },
+    "categories": {
+      "auth": {
+        "AmplifiedTasks": {}
+      },
+      "analytics": {
+        "Pinpoint": {
+          "Name": "amplifiedtasks-staging",
+          "Id": "16febaebc1204e2d82ac39c2c41bdbed"
+        },
+        "amplifiedtasks": {}
+      },
+      "api": {
+        "AmplifiedTasks": {}
+      },
+      "notifications": {
+        "Pinpoint": {
+          "Name": "amplifiedtasks-staging",
+          "Id": "16febaebc1204e2d82ac39c2c41bdbed",
+          "Region": "us-east-1"
+        }
+      }
+    }
+  }
+}

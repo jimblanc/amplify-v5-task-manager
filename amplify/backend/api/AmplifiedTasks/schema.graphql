@@ -1,0 +1,16 @@
+type Comment @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  postedTime: AWSDateTime
+  message: String
+  taskID: ID! @index(name: "byTask")
+}
+
+type Task @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  description: String
+  complete: Boolean
+  Comments: [Comment] @hasMany(indexName: "byTask", fields: ["id"])
+  dueDate: AWSDateTime
+  title: String
+}
+ 

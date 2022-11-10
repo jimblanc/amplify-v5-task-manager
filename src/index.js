@@ -1,13 +1,41 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+import {
+  createBrowserRouter,
+  RouterProvider
+} from 'react-router-dom';
+import { Amplify } from 'aws-amplify';
+import { Authenticator } from '@aws-amplify/ui-react';
+import TaskList from './routes/list';
+import CreateTask from './routes/createTask';
 import reportWebVitals from './reportWebVitals';
+import awsExports from './aws-exports';
+
+import '@aws-amplify/ui-react/styles.css';
+import './index.css';
+import './App.css';
+
+// Configure Amplify
+Amplify.configure(awsExports);
+
+// Configure navigation router
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <TaskList />,
+  },
+  {
+    path: "/create-task",
+    element: <CreateTask />,
+  }
+]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Authenticator>
+      <RouterProvider router={router} />
+    </Authenticator>
   </React.StrictMode>
 );
 

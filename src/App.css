@@ -3,3 +3,7 @@
   min-width: 500px;
   margin: 25px auto;
 }
+
+.statusText {
+  color: #2d2d2d;
+}

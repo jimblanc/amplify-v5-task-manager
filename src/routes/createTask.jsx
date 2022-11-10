@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'
 import { Text, View, Heading } from '@aws-amplify/ui-react';
 import CreateTaskForm from '../ui-components/CreateTaskForm';
+import { navigateHome } from '../utils';
 
 function CreateTask() {
   const navigate = useNavigate();
-  const navigateHome = () => navigate('/');
 
   return (
     <View className="App">
@@ -13,12 +13,8 @@ function CreateTask() {
       <Text marginBottom={"medium"} marginTop={"large"}>Use the form below to create a new task.</Text>
 
       <CreateTaskForm 
-        onSuccess={() => {
-          navigateHome()
-        }}
-        onCancel={() => {
-          navigateHome()
-        }}
+        onSuccess={() => navigateHome(navigate)}
+        onCancel={() => navigateHome(navigate)}
       />
     </View>
   );

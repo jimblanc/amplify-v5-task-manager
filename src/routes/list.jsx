@@ -90,8 +90,6 @@ function TaskList() {
   };
 
   const loadTasks = async () => {
-    await new Promise(r => setTimeout(r, 250));
-
     setLoadingTasks(true);
 
     const pendingTasks = await DataStore.query(Task, task => task.complete.eq(null));
@@ -118,7 +116,7 @@ function TaskList() {
             }}
           >Set a Reminder</Button>
           <Button marginTop="small" size="small" marginLeft="small" onClick={() => openCommentModal(task)}>
-            <FaComment /><Text marginLeft={5}>View Comments</Text>
+            View Comments
           </Button>
         </Card>
       </View>

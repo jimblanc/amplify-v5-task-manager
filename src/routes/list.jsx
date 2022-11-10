@@ -37,6 +37,8 @@ function TaskList() {
   };
 
   const loadTasks = async () => {
+    await new Promise(r => setTimeout(r, 250));
+
     setLoadingTasks(true);
 
     const pendingTasks = await DataStore.query(Task, task => task.complete.eq(null));

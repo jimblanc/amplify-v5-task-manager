@@ -5,6 +5,7 @@ import CreateTaskForm from '../ui-components/CreateTaskForm';
 
 function CreateTask() {
   const navigate = useNavigate();
+  const navigateHome = () => navigate('/');
 
   return (
     <View className="App">
@@ -12,13 +13,11 @@ function CreateTask() {
       <Text marginBottom={"medium"} marginTop={"large"}>Use the form below to create a new task.</Text>
 
       <CreateTaskForm 
-        onSuccess={async () => {
-          await new Promise(r => setTimeout(r, 250));
-          
-          navigate('/');
+        onSuccess={() => {
+          navigateHome()
         }}
         onCancel={() => {
-          navigate('/');
+          navigateHome()
         }}
       />
     </View>

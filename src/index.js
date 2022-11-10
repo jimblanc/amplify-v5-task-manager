@@ -32,11 +32,9 @@ const router = createBrowserRouter([
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <Authenticator>
-      <RouterProvider router={router} />
-    </Authenticator>
-  </React.StrictMode>
+  <Authenticator>
+    <RouterProvider router={router} />
+  </Authenticator>
 );
 
 // If you want to start measuring performance in your app, pass a function

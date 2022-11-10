@@ -5,7 +5,7 @@ import Modal from 'react-modal';
 import { Notifications, DataStore } from 'aws-amplify';
 import { FaComment } from 'react-icons/fa';
 import { Text, Tabs, TabItem, Loader, View, Heading, withInAppMessaging, Link, Card, Button } from '@aws-amplify/ui-react';
-import { Task } from '../models';
+import { Task, Comment } from '../models';
 import { 
   PostCommentForm 
 } from '../ui-components';
@@ -30,19 +30,50 @@ function TaskList() {
   const location = useLocation();
   const navigate = useNavigate();
   const [ modalIsOpen, setModalIsOpen ] = useState(false);
-  const [ loadingTasks, setLoadingTasks ] = useState(false);
   const [ loadingComments, setLoadingComments ] = useState(false);
-  const [ pendingTasks, setPendingTasks ] = useState([]);
-  const [ completedTasks, setCompletedTasks ] = useState([]);
+  const [ rawPendingTasks, setRawPendingTasks ] = useState([]);
+  const [ rawCompletedTasks, setRawCompletedTasks ] = useState([]);
   const [ taskComments, setTaskComments ] = useState([]);
   const [ completedTaskCount, setCompletedTaskCount ] = useState(0);
   const [ commentFeedTask, setCommentFeedTask ] = useState();
 
   const loadingIndicator = <Loader size={'large'} margin={'large'} />;
 
+  /*const refreshPendingTasks = async () => {
+    const refreshedPendingTasks = await DataStore.query(Task, task => task.complete.eq(null)); 
+    console.log('+ pending refresh', refreshedPendingTasks);
+    return refreshedPendingTasks;
+  };
+
+  const refreshCompletedTasks = async () => {
+    const refreshedCompletedTasks = await DataStore.query(Task, task => task.complete.eq(true)); 
+    return refreshedCompletedTasks;
+  };*/
+
+  const setupTaskSubscriptions = () => {
+    DataStore.observeQuery(Task, task => task.complete.eq(null))
+      .subscribe(snapshot => {
+        console.log('+ pending snapshot', snapshot);
+        setRawPendingTasks(snapshot.items);
+
+        /*refreshPendingTasks().then((refreshedPendingTasks) => {
+          setRawPendingTasks(refreshedPendingTasks);
+        });*/
+      });
+    
+    DataStore.observeQuery(Task, task => task.complete.eq(true))
+      .subscribe(snapshot => {
+        //console.log('+ completed snapshot', snapshot);
+        setRawCompletedTasks(snapshot.items);
+
+        /*refreshCompletedTasks().then((refreshedCompletedTasks) => {
+          setRawCompletedTasks(refreshedCompletedTasks);
+        });*/
+      });
+  };
+
   const openCommentModal = (task) => {
     setCommentFeedTask(task);
-    setModalIsOpen(true);
   };
 
   const loadCommentFeed = (task) => {
@@ -79,81 +110,66 @@ function TaskList() {
     );
 
     const newCompletedTaskCount = completedTaskCount+1;
-
     setCompletedTaskCount(newCompletedTaskCount);
 
     // Log metric
     InAppMessaging.dispatchEvent({ name: 'complete_task', metrics: { "task_count": newCompletedTaskCount }});
-
-    // Reload task lists
-    loadTasks();
-  };
-
-  const loadTasks = async () => {
-    await new Promise(r => setTimeout(r, 250));
-
-    setLoadingTasks(true);
-
-    const pendingTasks = await DataStore.query(Task, task => task.complete.eq(null));
-    const completedTasks = await DataStore.query(Task, task => task.complete.eq(true));
-
-    const renderedPendingTasks = pendingTasks.map(task => {
-      return <View key={task.id}>
-        <Card variation={'elevated'} marginTop="small">
-          <Heading level={5} marginBottom="small">
-            {task.title}
-          </Heading>
-          <Text marginBottom="small">
-            {task.description}
-          </Text>
-          <Text color="GrayText" fontSize={"small"}>
-            Due by: {moment(task.dueDate).format('MM/DD/YYYY HH:mm')}
-          </Text>
-          <Button variation={"primary"} marginTop="small" size="small"
-            onClick={() => completeTask(task)}
-          >Complete Task</Button>
-          <Button marginTop="small" size="small" marginLeft="small"
-            onClick={() => {
-              InAppMessaging.dispatchEvent({ name: 'premium_action', attributes: { "isPremium": "false" }});
-            }}
-          >Set a Reminder</Button>
-          <Button marginTop="small" size="small" marginLeft="small" onClick={() => openCommentModal(task)}>
-            <FaComment /><Text marginLeft={5}>View Comments</Text>
-          </Button>
-        </Card>
-      </View>
-    });
-
-    const renderedCompletedTasks = completedTasks.map(task => {
-      return <View key={task.id}>
-        <Card variation={'elevated'} marginTop="small">
-          <Heading level={5} marginBottom="small">
-            {task.title}
-          </Heading>
-          <Text marginBottom="small">
-            {task.description}
-          </Text>
-          <Text color="GrayText" fontSize={"small"}>
-            Originally due by: {moment(task.dueDate).format('MM/DD/YYYY HH:mm')}
-          </Text>
-        </Card>
-      </View>
-    });
-
-    setLoadingTasks(false);
-    setPendingTasks(renderedPendingTasks);
-    setCompletedTasks(renderedCompletedTasks);
   };
 
   // Populate initial task lists
   useEffect(() => {
-    loadTasks();
-  }, [location.key, completedTaskCount, commentFeedTask]);
+    setupTaskSubscriptions();
+  }, [location.key]);
 
   // Initial in-app notification message sync
   useEffect(() => {
     InAppMessaging.syncMessages();
   }, []);
+
+  // Build pending tasks
+  const renderedPendingTasks = rawPendingTasks.map(task => {
+    return <View key={task.id}>
+      <Card variation={'elevated'} marginTop="small">
+        <Heading level={5} marginBottom="small">
+          {task.title}
+        </Heading>
+        <Text marginBottom="small">
+          {task.description}
+        </Text>
+        <Text color="GrayText" fontSize={"small"}>
+          Due by: {moment(task.dueDate).format('MM/DD/YYYY HH:mm')}
+        </Text>
+        <Button variation={"primary"} marginTop="small" size="small"
+          onClick={() => completeTask(task)}
+        >Complete Task</Button>
+        <Button marginTop="small" size="small" marginLeft="small"
+          onClick={() => {
+            InAppMessaging.dispatchEvent({ name: 'premium_action', attributes: { "isPremium": "false" }});
+          }}
+        >Set a Reminder</Button>
+        <Button marginTop="small" size="small" marginLeft="small" onClick={() => openCommentModal(task)}>
+          <Text marginLeft={5}>View Comments</Text>
+        </Button>
+      </Card>
+    </View>
+  });
+
+  // Build completed tasks
+  const renderedCompletedTasks = rawCompletedTasks.map(task => {
+    return <View key={task.id}>
+      <Card variation={'elevated'} marginTop="small">
+        <Heading level={5} marginBottom="small">
+          {task.title}
+        </Heading>
+        <Text marginBottom="small">
+          {task.description}
+        </Text>
+        <Text color="GrayText" fontSize={"small"}>
+          Originally due by: {moment(task.dueDate).format('MM/DD/YYYY HH:mm')}
+        </Text>
+      </Card>
+    </View>
+  });
 
   return (
     <View className="App">
@@ -170,22 +186,18 @@ function TaskList() {
 
       <Tabs>
         <TabItem title="Pending">
-          { loadingTasks && loadingIndicator }
-
-          { (!loadingTasks && pendingTasks.length <= 0) && 
+          { renderedPendingTasks.length <= 0 && 
             <Text marginTop="large" className="statusText">You don't have any pending tasks, well done!</Text>
           }
 
-          {pendingTasks}
+          {renderedPendingTasks}
         </TabItem>
         <TabItem title="Completed">
-          { loadingTasks && loadingIndicator }
-
-          { (!loadingTasks && completedTasks.length <= 0) && 
+          { renderedCompletedTasks.length <= 0 && 
             <Text marginTop="large" className="statusText">You haven't completed any tasks yet, get to work!</Text>
           }
 
-          {completedTasks}
+          {renderedCompletedTasks}
         </TabItem>
       </Tabs>
 

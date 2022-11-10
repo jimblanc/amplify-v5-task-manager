@@ -12,5 +12,4 @@ type Task @model @auth(rules: [{allow: public}]) {
   Comments: [Comment] @hasMany(indexName: "byTask", fields: ["id"])
   dueDate: AWSDateTime
   title: String
-}
- 
+} 

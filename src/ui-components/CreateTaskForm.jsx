@@ -159,7 +159,7 @@ export default function CreateTaskForm(props) {
       ></TextField>
       <TextField
         label="Due date"
-        descriptiveText="When you task wil be due."
+        descriptiveText="When your task wil be due."
         isRequired={false}
         isReadOnly={false}
         type="datetime-local"

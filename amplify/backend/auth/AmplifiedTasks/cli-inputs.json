@@ -2,7 +2,7 @@
   "version": "1",
   "cognitoConfig": {
     "identityPoolName": "testAuthIdentityPool",
-    "allowUnauthenticatedIdentities": true,
+    "allowUnauthenticatedIdentities": false,
     "resourceNameTruncated": "amplif4244d25c",
     "userPoolName": "AmplifiedTasks",
     "autoVerifiedAttributes": [
@@ -55,6 +55,7 @@
       ]
     },
     "breakCircularDependency": true,
-    "dependsOn": []
+    "dependsOn": [],
+    "hostedUI": false
   }
 }

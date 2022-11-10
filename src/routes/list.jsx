@@ -1,9 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import moment from 'moment';
 import { useLocation, useNavigate } from 'react-router-dom'
+import Modal from 'react-modal';
 import { Notifications, DataStore } from 'aws-amplify';
+import { FaComment } from 'react-icons/fa';
 import { Text, Tabs, TabItem, Loader, View, Heading, withInAppMessaging, Link, Card, Button } from '@aws-amplify/ui-react';
 import { Task } from '../models';
+import { 
+  PostCommentForm 
+} from '../ui-components';
+
+// Comment modal styles
+const modalStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    width: '500px',
+  },
+};
 
 // Define In App messaging events
 const { InAppMessaging } = Notifications;
@@ -11,12 +29,47 @@ const { InAppMessaging } = Notifications;
 function TaskList() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [ modalIsOpen, setModalIsOpen ] = useState(false);
   const [ loadingTasks, setLoadingTasks ] = useState(false);
+  const [ loadingComments, setLoadingComments ] = useState(false);
   const [ pendingTasks, setPendingTasks ] = useState([]);
   const [ completedTasks, setCompletedTasks ] = useState([]);
+  const [ taskComments, setTaskComments ] = useState([]);
   const [ completedTaskCount, setCompletedTaskCount ] = useState(0);
+  const [ commentFeedTask, setCommentFeedTask ] = useState();
 
   const loadingIndicator = <Loader size={'large'} margin={'large'} />;
+
+  const openCommentModal = (task) => {
+    setCommentFeedTask(task);
+    setModalIsOpen(true);
+  };
+
+  const loadCommentFeed = (task) => {
+    const loadComments = async () => {
+      setLoadingComments(true);
+      
+      // Make it easier to see
+      await new Promise(r => setTimeout(r, 1000));
+
+      const comments = await task.Comments.toArray();
+
+      const renderedComments = comments.map((comment) => {
+        return (<Card key={comment.id} variation={'outlined'} marginBottom="small" className='task-comment'>
+          <Text>{comment.message}</Text>
+
+          <Text color="GrayText" fontSize={"small"}>
+            Posted on {moment(comment.createdAt).format('MM/DD/YYYY HH:mm')}
+          </Text>
+        </Card>);
+      });
+
+      setTaskComments(renderedComments);
+      setLoadingComments(false);
+    };
+
+    loadComments();
+  };
 
   const completeTask = async (task) => {
     await DataStore.save(
@@ -30,7 +83,7 @@ function TaskList() {
     setCompletedTaskCount(newCompletedTaskCount);
 
     // Log metric
-    InAppMessaging.dispatchEvent({ name: 'complete_task', metrics: { "task_count": newCompletedTaskCount + 3 }});
+    InAppMessaging.dispatchEvent({ name: 'complete_task', metrics: { "task_count": newCompletedTaskCount }});
 
     // Reload task lists
     loadTasks();
@@ -64,6 +117,9 @@ function TaskList() {
               InAppMessaging.dispatchEvent({ name: 'premium_action', attributes: { "isPremium": "false" }});
             }}
           >Set a Reminder</Button>
+          <Button marginTop="small" size="small" marginLeft="small" onClick={() => openCommentModal(task)}>
+            <FaComment /><Text marginLeft={5}>View Comments</Text>
+          </Button>
         </Card>
       </View>
     });
@@ -92,7 +148,7 @@ function TaskList() {
   // Populate initial task lists
   useEffect(() => {
     loadTasks();
-  }, [location.key, completedTaskCount]);
+  }, [location.key, completedTaskCount, commentFeedTask]);
 
   // Initial in-app notification message sync
   useEffect(() => {
@@ -132,6 +188,38 @@ function TaskList() {
           {completedTasks}
         </TabItem>
       </Tabs>
+
+      <Modal
+        isOpen={modalIsOpen}
+        style={modalStyles}
+        onAfterOpen={() => loadCommentFeed(commentFeedTask)}
+        onRequestClose={() => setModalIsOpen(false)}
+        contentLabel="Comment Feed"
+        ariaHideApp={false}
+      >
+        <Heading level={5} marginBottom="small">
+          Task Comments
+        </Heading>
+
+        {taskComments}
+
+        { (!loadingComments && taskComments.length <= 0) && 
+          <Text className="statusText">No one has posted a comment yet.</Text>
+        }
+
+        { loadingComments && loadingIndicator }
+
+        <PostCommentForm
+          task={commentFeedTask}
+          className={'comment-form'}
+          onSubmit={(fields) => {
+            fields.taskID = commentFeedTask.id;
+            return fields;
+          }}
+          onSuccess={() => setModalIsOpen(false)}
+          onCancel={() => setModalIsOpen(false)}
+        />
+      </Modal>
     </View>
   );
 }

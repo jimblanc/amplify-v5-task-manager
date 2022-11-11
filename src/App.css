@@ -16,3 +16,7 @@
   border-radius: 3px;
   border-color: #cccccc;
 }
+
+.amplify-inappmessaging-messagelayout__text-container--horizontal {
+  padding-top: 20px;
+}

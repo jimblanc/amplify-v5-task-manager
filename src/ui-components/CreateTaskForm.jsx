@@ -159,7 +159,7 @@ export default function CreateTaskForm(props) {
       ></TextField>
       <TextField
         label="Due date"
-        descriptiveText="When you task wil be due."
+        descriptiveText="When your task wil be due."
         isRequired={false}
         isReadOnly={false}
         type="datetime-local"
@@ -196,15 +196,7 @@ export default function CreateTaskForm(props) {
         ></Button>
         <Flex {...getOverrideProps(overrides, "RightAlignCTASubFlex")}>
           <Button
-            children="Cancel"
-            type="button"
-            onClick={() => {
-              onCancel && onCancel();
-            }}
-            {...getOverrideProps(overrides, "CancelButton")}
-          ></Button>
-          <Button
-            children="Submit"
+            children="Create Post"
             type="submit"
             variation="primary"
             isDisabled={Object.values(errors).some((e) => e?.hasError)}

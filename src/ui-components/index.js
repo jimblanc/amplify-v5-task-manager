@@ -4,5 +4,4 @@
  * Any changes to this file will be overwritten when running amplify pull. *
  **************************************************************************/
 
-export { default as PostCommentForm } from "./PostCommentForm";
 export { default as CreateTaskForm } from "./CreateTaskForm";

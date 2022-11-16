@@ -86,11 +86,7 @@ function TaskList() {
 
       <Expander isCollapsible>
         <ExpanderItem title="Create a new task" value="create-task">
-          <CreateTaskForm
-            onSuccess={() => {
-              console.log('+ Successfully created new task.')
-            }}
-          />
+          <CreateTaskForm />
         </ExpanderItem>
       </Expander>
 

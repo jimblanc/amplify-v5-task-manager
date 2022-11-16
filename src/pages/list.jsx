@@ -17,25 +17,17 @@ function TaskList() {
    * Setup DataStore subscriptions for our pending & completed tasks.
    */
   const setupTaskSubscriptions = () => {
-    DataStore.observeQuery(Task, task => task.complete.eq(null))
+    DataStore.observeQuery(Task, task => task.complete.ne(true))
       .subscribe(snapshot => {
         console.log('+ pending snapshot', snapshot);
         setRawPendingTasks(snapshot.items);
-
-        /*refreshPendingTasks().then((refreshedPendingTasks) => {
-          setRawPendingTasks(refreshedPendingTasks);
-        });*/
       });
 
-      DataStore.observeQuery(Task, task => task.complete.eq(true))
+      /*DataStore.observeQuery(Task, task => task.complete.eq(true))
       .subscribe(snapshot => {
         //console.log('+ pending snapshot', snapshot);
         setRawCompletedTasks(snapshot.items);
-
-        /*refreshPendingTasks().then((refreshedPendingTasks) => {
-          setRawCompletedTasks(refreshedPendingTasks);
-        });*/
-      });
+      });*/
   };
 
   /**

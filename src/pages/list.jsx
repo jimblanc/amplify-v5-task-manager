@@ -5,7 +5,6 @@ import { Text, Tabs, TabItem, View, Heading, withInAppMessaging, Card, Button, E
 import { Task } from '../models';
 import { CreateTaskForm } from '../ui-components';
 
-// Define In App messaging events
 const { InAppMessaging } = Notifications;
 
 function TaskList() {

@@ -16,7 +16,7 @@ function TaskList() {
    * Setup DataStore subscriptions for our tasks.
    */
   const setupTaskSubscriptions = () => {
-    DataStore.observeQuery(Task, task => task.complete.ne(true))
+    DataStore.observeQuery(Task)
       .subscribe(snapshot => {
         setRawTasks(snapshot.items);
       });
@@ -94,10 +94,10 @@ function TaskList() {
         </ExpanderItem>
       </Expander>
 
-      <Heading level={4} marginTop={'medium'}>Your Pending Tasks</Heading>
+      <Heading level={4} marginTop={'medium'}>Your Tasks</Heading>
 
       { renderedTasks.length <= 0 && 
-        <Text marginTop="large" className="statusText">You don't have any pending tasks, well done!</Text>
+        <Text marginTop="large" className="statusText">You haven't created any tasks yet!</Text>
       }
 
       {renderedTasks}

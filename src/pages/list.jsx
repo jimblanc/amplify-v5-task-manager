@@ -9,25 +9,17 @@ import { CreateTaskForm } from '../ui-components';
 const { InAppMessaging } = Notifications;
 
 function TaskList() {
-  const [ rawPendingTasks, setRawPendingTasks ] = useState([]);
-  const [ rawCompletedTasks, setRawCompletedTasks ] = useState([]);
+  const [ rawTasks, setRawTasks ] = useState([]);
   const [ completedTaskCount, setCompletedTaskCount ] = useState(0);
 
   /**
-   * Setup DataStore subscriptions for our pending & completed tasks.
+   * Setup DataStore subscriptions for our tasks.
    */
   const setupTaskSubscriptions = () => {
     DataStore.observeQuery(Task, task => task.complete.ne(true))
       .subscribe(snapshot => {
-        console.log('+ pending snapshot', snapshot);
-        setRawPendingTasks(snapshot.items);
+        setRawTasks(snapshot.items);
       });
-
-      /*DataStore.observeQuery(Task, task => task.complete.eq(true))
-      .subscribe(snapshot => {
-        //console.log('+ pending snapshot', snapshot);
-        setRawCompletedTasks(snapshot.items);
-      });*/
   };
 
   /**
@@ -61,8 +53,10 @@ function TaskList() {
     InAppMessaging.syncMessages();
   }, []);
 
-  // Build pending tasks
-  const renderedPendingTasks = rawPendingTasks.map(task => {
+  // Build tasks
+  const renderedTasks = rawTasks.map(task => {
+    const taskIsComplete = task.complete;
+
     return <View key={task.id}>
       <Card variation={'elevated'} marginTop="small">
         <Heading level={5} marginBottom="small">
@@ -72,31 +66,15 @@ function TaskList() {
           {task.description}
         </Text>
         <Text color="GrayText" fontSize={"small"}>
-          Due by: {moment(task.dueDate).format('MM/DD/YYYY HH:mm')}
+          { taskIsComplete ? 'Originally due by' : 'Due by' }: {moment(task.dueDate).format('MM/DD/YYYY HH:mm')}
         </Text>
         <Button variation={"primary"} marginTop="small" size="small"
+          isDisabled={taskIsComplete}
           onClick={() => completeTask(task)}
         >Complete Task</Button>
         <Button marginTop="small" size="small" marginLeft="small"
           onClick={accessPremiumFeature}
         >Set a Reminder</Button>
-      </Card>
-    </View>
-  });
-
-  // Build completed tasks
-  const renderedCompletedTasks = rawCompletedTasks.map(task => {
-    return <View key={task.id}>
-      <Card variation={'elevated'} marginTop="small">
-        <Heading level={5} marginBottom="small">
-          {task.title}
-        </Heading>
-        <Text marginBottom="small">
-          {task.description}
-        </Text>
-        <Text color="GrayText" fontSize={"small"}>
-          Originally due by: {moment(task.dueDate).format('MM/DD/YYYY HH:mm')}
-        </Text>
       </Card>
     </View>
   });
@@ -116,22 +94,13 @@ function TaskList() {
         </ExpanderItem>
       </Expander>
 
-      <Tabs>
-        <TabItem title="Pending">
-          { renderedPendingTasks.length <= 0 && 
-            <Text marginTop="large" className="statusText">You don't have any pending tasks, well done!</Text>
-          }
+      <Heading level={4} marginTop={'medium'}>Your Pending Tasks</Heading>
 
-          {renderedPendingTasks}
-        </TabItem>
-        <TabItem title="Completed">
-          { renderedCompletedTasks.length <= 0 && 
-            <Text marginTop="large" className="statusText">You haven't completed any tasks yet, get to work!</Text>
-          }
+      { renderedTasks.length <= 0 && 
+        <Text marginTop="large" className="statusText">You don't have any pending tasks, well done!</Text>
+      }
 
-          {renderedCompletedTasks}
-        </TabItem>
-      </Tabs>
+      {renderedTasks}
     </View>
   );
 }
